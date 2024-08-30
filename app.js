@@ -1,7 +1,7 @@
 const sqlite3 = require('better-sqlite3')
 const db = sqlite3('./sql/studietid.db', {verbose: console.log})
 
-let result = addUser('Roe', 'Nøttseter', 3, 0, 'roe@nottseter.no')
+let result = addUser('roenoe', '', 1, 1, 'roe@admin.com')
 
 function addUser(firstName, lastName, idRole, isAdmin, email)
  {
