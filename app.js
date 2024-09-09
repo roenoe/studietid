@@ -1,7 +1,13 @@
 const sqlite3 = require('better-sqlite3')
+const path = require('path')
 const db = sqlite3('./sql/studietid.db', {verbose: console.log})
+const express = require('express')
+const app = express()
+const staticPath = path.join(__dirname, 'public')
 
-let result = addUser('Per', 'Hansen', 3, 0, 'per@hansen.no')
+app.get('/'), (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'))
+}
 
 function addUser(firstName, lastName, idRole, isAdmin, email)
  {
@@ -44,7 +50,6 @@ function checkEmail(email) {
         return {error: 'Email already exists'}
     }
     return false
-
 }
 
 function getIdByEmail(email) { 
@@ -58,20 +63,36 @@ function delUser(id) {
     sql.run(id)
 }
 
-let activity = registerActivity(6, '2024-09-03 16:00:00', 1, 1, 1, 90)
+function registerActivity(idUser, idSubject, idRoom, idStatus, duration) {
+    let date = new Date()
+    let sqlDate = date.toISOString().slice(0, 19).replace('T', ' ')
+    let startTime = sqlDate
 
-function registerActivity(idUser, startTime, idSubject, idRoom, idStatus, duration) {
     let check = checkActivity(idUser, startTime)
     let sql = db.prepare("INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus, duration) " + 
                          " values (?, ?, ?, ?, ?, ?)")
-    sql.run(idUser, startTime, idSubject, idRoom, idStatus, duration)
+    sql.run(idUser, sqlDate, idSubject, idRoom, idStatus, duration)
 }
 
-/*function checkActivity(idUser, startTime) {
+function checkActivity(idUser, startTime) {
     let sql = db.prepare('SELECT * FROM activity WHERE idUser = ? AND startTime = ?')
     let rows = sql.all(idUser, startTime)
     if (rows.length > 0) {
         return {error: 'Activity already exists'}
     }
     return false
-}*/
+}
+
+app.get('/getusers', (req, res) => { 
+    console.log('/getUsers/')
+
+    const sql = db.prepare('SELECT user.id as userid, firstname, lastname, role.name  as role ' + 
+        'FROM user inner join role on user.idrole = role.id ');
+    let users = sql.all()   
+    console.log("users.length", users.length)
+    
+    res.send(users)
+})
+
+app.use(express.static(staticPath)) // Serve static files
+app.listen(21570, () => console.log('Server running on http://localhost:21570/')) 
