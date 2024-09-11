@@ -5,9 +5,29 @@ const express = require('express')
 const app = express()
 const staticPath = path.join(__dirname, 'public')
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 app.get('/'), (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'))
 }
+
+app.post('/adduser/', (req, res) => {
+    console.log("DLKJFLKJDSFLJLSDFJ")
+    const { firstName, lastName, idRole, isAdmin, email } = req.body
+
+    req = req.body
+    console.log(req)
+
+    console.log(firstName, lastName, idRole, isAdmin, email)
+    let user = addUser(req.firstName, req.lastName, req.idRole, req.isAdmin, req.email)
+
+    if (!user) {
+        return res.json({error: 'Failed to register user'})
+    }
+
+    return res.json({ message: 'User registered', user: user })
+})
 
 function addUser(firstName, lastName, idRole, isAdmin, email)
  {
@@ -86,7 +106,7 @@ function checkActivity(idUser, startTime) {
 app.get('/getusers', (req, res) => { 
     console.log('/getUsers/')
 
-    const sql = db.prepare('SELECT user.id as userid, firstname, lastname, role.name  as role ' + 
+    const sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, role.name  as role ' + 
         'FROM user inner join role on user.idrole = role.id ');
     let users = sql.all()   
     console.log("users.length", users.length)
