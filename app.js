@@ -13,7 +13,6 @@ app.get('/'), (req, res) => {
 }
 
 app.post('/adduser/', (req, res) => {
-    console.log("DLKJFLKJDSFLJLSDFJ")
     const { firstName, lastName, idRole, isAdmin, email } = req.body
 
     req = req.body
@@ -103,7 +102,7 @@ function checkActivity(idUser, startTime) {
     return false
 }
 
-app.get('/getusers', (req, res) => { 
+app.get('/getusers/', (req, res) => { 
     console.log('/getUsers/')
 
     const sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, role.name  as role ' + 
@@ -112,6 +111,18 @@ app.get('/getusers', (req, res) => {
     console.log("users.length", users.length)
     
     res.send(users)
+})
+
+app.get('/getactivities/', (req, res) => { 
+    console.log('/getactivities/')
+    const sqltext = 'select activity.id as activityid, firstname as firstname, lastname as lastname, email, subject.name as subjectname, startTime as starttime, duration, room.name as roomname, status.name as status ' + 
+        'FROM activity inner join user on activity.idUser = user.id ' + ' inner join room on activity.idRoom = room.id ' + ' inner join subject on activity.idSubject = subject.id ' + ' inner join status on activity.idStatus = status.id '
+//        console.log(sqltext)
+    const sql = db.prepare(sqltext);
+
+        let activities = sql.all()   
+    console.log("activities.length", activities.length)
+    res.send(activities)
 })
 
 app.use(express.static(staticPath)) // Serve static files

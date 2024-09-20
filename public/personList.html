@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    
+    <h1>Studietid</h1>
+
+    <div class="container">
+        <h2>Legg til en person</h2>
+        <form id="regForm">
+            <input type="text" id="firstName" placeholder="fornavn" required>
+            <input type="text" id="lastName" placeholder="etternavn" required>
+            <input type="email" id="email" placeholder="email" required>
+            <button type="submit">Legg til</button>
+        </form>
+        <div class="error"></div>
+        <div class="success"></div>
+    </div>
+
+    <h1>Person Liste</h1>
+    <table id="personList">  </table>
+
+<script src="./personList.js"></script>
+</body>
+</html>
