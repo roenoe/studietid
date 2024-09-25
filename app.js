@@ -114,15 +114,28 @@ app.get('/getusers/', (req, res) => {
 })
 
 app.get('/getactivities/', (req, res) => { 
-    console.log('/getactivities/')
+//    console.log('/getactivities/')
     const sqltext = 'select activity.id as activityid, firstname as firstname, lastname as lastname, email, subject.name as subjectname, startTime as starttime, duration, room.name as roomname, status.name as status ' + 
         'FROM activity inner join user on activity.idUser = user.id ' + ' inner join room on activity.idRoom = room.id ' + ' inner join subject on activity.idSubject = subject.id ' + ' inner join status on activity.idStatus = status.id '
 //        console.log(sqltext)
     const sql = db.prepare(sqltext);
 
         let activities = sql.all()   
-    console.log("activities.length", activities.length)
+//    console.log("activities.length", activities.length)
     res.send(activities)
+})
+
+app.post('/updateactivity/', (req, res) => {
+    console.log('/updateactivity/')
+    const { activityid, idStatus } = req.body
+
+    console.log(req.body)
+
+    console.log("activityid", activityid)
+    console.log("idStatus", idStatus)
+    let sql = db.prepare('UPDATE activity SET idStatus = ? WHERE id = ?')
+    sql.run(idStatus, activityid)
+    res.send('Activity updated')
 })
 
 app.use(express.static(staticPath)) // Serve static files
