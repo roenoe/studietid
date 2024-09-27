@@ -13,3 +13,15 @@ td, th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+.red {
+    background-color: red;
+}
+
+.green {
+    background-color: lightgreen;
+}
+
+.orange {
+    background-color: orange;
+}

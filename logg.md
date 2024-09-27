@@ -16,3 +16,6 @@ Jeg må få inn noen inputfelt der sånn at administratorer kan opprette aktivit
 ## 25/09/24
 Skrev en to do list. Prøvde å gi admins tilgang til å oppdatere statusen til aktiviteter. Ikke i mål enda. 
 
+## 27/09/24
+Admins kan nå oppdatere statusen til aktiviteter. 
+

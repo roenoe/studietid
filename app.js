@@ -138,5 +138,29 @@ app.post('/updateactivity/', (req, res) => {
     res.send('Activity updated')
 })
 
+app.post('/deleteactivity/', (req, res) => {
+    console.log('/deleteactivity/')
+    const { activityid } = req.body
+
+    console.log(req.body)
+
+    console.log("activityid", activityid)
+    let sql = db.prepare('DELETE FROM activity WHERE id = ?')
+    sql.run(activityid)
+    res.send('Activity deleted')
+})
+
+
+/*app.post('/deleteuser/', (req, res) => {
+    console.log('/deleteuser/')
+    const { userid } = req.body
+
+    console.log(req.body)
+
+    console.log("userid", userid)
+    delUser(userid)
+    res.send('User deleted')
+})*/
+
 app.use(express.static(staticPath)) // Serve static files
 app.listen(21570, () => console.log('Server running on http://localhost:21570/')) 
