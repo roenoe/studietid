@@ -83,8 +83,8 @@ function delUser(id) {
 }
 
 function registerActivity(idUser, idSubject, idRoom, idStatus, duration) {
-    let date = new Date()
-    let sqlDate = date.toISOString().slice(0, 19).replace('T', ' ')
+    let date = new Date().toLocaleString('sv-SE', {timeZone: 'Europe/Oslo'})
+    let sqlDate = date.toString().slice(0, 19).replace('T', ' ')
     let startTime = sqlDate
 
     let check = checkActivity(idUser, startTime)
@@ -125,6 +125,22 @@ app.get('/getactivities/', (req, res) => {
     res.send(activities)
 })
 
+app.get('/getsubjects/', (req, res) => {
+    console.log('/getsubjects/')
+    const sql = db.prepare('SELECT * FROM subject')
+    let subjects = sql.all()
+    console.log("subjects.length", subjects.length)
+    res.send(subjects)
+})
+
+app.get('/getrooms/', (req, res) => {
+    console.log('/getrooms/')
+    const sql = db.prepare('SELECT * FROM room')
+    let rooms = sql.all()
+    console.log("rooms.length", rooms.length)
+    res.send(rooms)
+})
+
 app.post('/updateactivity/', (req, res) => {
     console.log('/updateactivity/')
     const { activityid, idStatus } = req.body
@@ -149,6 +165,36 @@ app.post('/deleteactivity/', (req, res) => {
     sql.run(activityid)
     res.send('Activity deleted')
 })
+
+app.post('/registeractivity/', (req, res) => {
+    console.log('/registeractivity/')
+    const { idUser, idSubject, idRoom, idStatus, duration } = req.body
+
+    console.log(req.body)
+
+    console.log("idUser", idUser)
+    console.log("idSubject", idSubject)
+    console.log("idRoom", idRoom)
+    console.log("idStatus", idStatus)
+    console.log("duration", duration)
+    registerActivity(idUser, idSubject, idRoom, idStatus, duration)
+    res.send('Activity registered')
+})
+
+/*app.post('/addactivity/'), (req, res) => {        
+    const { idUser, idSubject, idRoom, idStatus, duration } = req.body
+
+    console.log(req.body)
+
+    console.log(idUser, idSubject, idRoom, idStatus, duration)
+    let activity = registerActivity(idUser, idSubject, idRoom, idStatus, duration)
+
+    if (!activity) {
+        return res.json({error: 'Failed to register activity'})
+    }
+
+    return res.json({ message: 'Activity registered', activity: activity })
+}*/
 
 
 /*app.post('/deleteuser/', (req, res) => {

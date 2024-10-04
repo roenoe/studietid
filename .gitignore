@@ -8,3 +8,6 @@ node_modules/
 dist/
 build/
 
+# Ignore all the unnecessary sql files
+sql/StudietidDB.db
+sql/trash/

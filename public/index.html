@@ -8,8 +8,30 @@
 <body>
     
     <h1>Studietid</h1>
-    <a href="./personList.html">Person List</a>
-    <a href="./activityList.html">Activity List</a>
+    <a href="./">Home</a>
+    <a href="admin/">Admin</a>
+
+    <h2>Legg til en aktivitet</h2>
+    <div class="container"></div>
+        <form id="regForm">
+            <select id="idSubject" required>
+                <option value="">Velg fag</option>
+            </select>
+            <select id="idRoom" required>Velg rom
+                <option value="">Velg rom</option>
+            </select>
+            <select id="duration">Velg lengde i minutter
+                <option value=30>30</option>
+                <option value=45>45</option>
+                <option value=60>60</option>
+                <option value=90>90</option>
+                <option value=120>120</option>
+            </select>
+            <button type="submit">Submit</button>
+        </form>
+        <div class="error"></div>
+        <div class="success"></div>
+    </div>
 
 <script src="./script.js"></script>
 </body>

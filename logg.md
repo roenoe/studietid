@@ -19,3 +19,10 @@ Skrev en to do list. Prøvde å gi admins tilgang til å oppdatere statusen til 
 ## 27/09/24
 Admins kan nå oppdatere statusen til aktiviteter. 
 
+## 01/10/24
+Jeg flyttet adminsidene til en egen mappe, og jeg begynte på en funksjon for å la brukere opprette egne aktiviteter
+
+## 04/10/24
+Nå er det mulig for brukere å opprette aktiviteter. Jeg har også passet på at datoen er formatert rett og satt til Oslo sin tidssone.
+
+
