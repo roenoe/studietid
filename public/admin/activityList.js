@@ -44,8 +44,8 @@ function displayPendingActivities() {
             <td>${activity.starttime}</td>
             <td>${activity.duration}</td>
             <td>
-                <button onclick="confirmActivity(${activity.activityid})" class="green">Confirm</button>
-                <button onclick="denyActivity(${activity.activityid})" class="orange">Deny</button>
+                <button onclick="updateActivity(${activity.activityid}, 3)" class="green">Confirm</button>
+                <button onclick="updateActivity(${activity.activityid}, 1)" class="orange">Deny</button>
             </td>
             `
             activityList.appendChild(listItem);
@@ -78,7 +78,7 @@ function displayFailedActivities() {
             <td>${activity.starttime}</td>
             <td>${activity.duration}</td>
             <td>
-                <button onclick="confirmActivity(${activity.activityid})" class="green">Confirm</button>
+                <button onclick="updateActivity(${activity.activityid}, 3)" class="green">Confirm</button>
                 <button onclick="delActivity(${activity.activityid})" class="red">Delete</button>
             </td>
             `
@@ -111,20 +111,19 @@ function displayCompletedActivities() {
             <td>${activity.roomname}</td>
             <td>${activity.starttime}</td>
             <td>${activity.duration}</td>
-            <td><button onclick="denyActivity(${activity.activityid})" class="orange">Annuler</button></td>
+            <td><button onclick="updateActivity(${activity.activityid}, 1)" class="orange">Annuler</button></td>
             `
             activityList.appendChild(listItem);
         }
     });
 }
 
-async function confirmActivity(activityid) { 
-//    event.preventDefault()
+async function updateActivity(activityId, idStatus) {
     let activity = {
-        activityid: activityid,
-        idStatus: 3
+        activityid: activityId,
+        idStatus: idStatus
     }
-    
+
     console.log(activity)
 
     try {
@@ -145,46 +144,11 @@ async function confirmActivity(activityid) {
             document.getElementById('success').innerText = data.message
             document.getElementById('error').innerText = ''
         }
-    }
-    catch (error) {
+    } catch (error) {
         console.error('Error:', error);
     }
     fetchActivities()
 }
-
-async function denyActivity(activityid) { 
-    //    event.preventDefault()
-        let activity = {
-            activityid: activityid,
-            idStatus: 1
-        }
-        
-        console.log(activity)
-    
-        try {
-            let response = await fetch('/updateactivity/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(activity)
-            })
-    
-            let data = await response.json();
-    
-            if (data.error) {
-                document.getElementById('error').innerText = data.error
-                document.getElementById('success').innerText = ''
-            } else { 
-                document.getElementById('success').innerText = data.message
-                document.getElementById('error').innerText = ''
-            }
-        }
-        catch (error) {
-            console.error('Error:', error);
-        }
-        fetchActivities()
-    }
 
 async function delActivity(activityid) {
     let activity = {

@@ -24,5 +24,6 @@ Jeg flyttet adminsidene til en egen mappe, og jeg begynte på en funksjon for å
 
 ## 04/10/24
 Nå er det mulig for brukere å opprette aktiviteter. Jeg har også passet på at datoen er formatert rett og satt til Oslo sin tidssone.
+Ryddet i funksjoner for å oppdatere aktiviteter
 
 
