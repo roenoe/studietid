@@ -11,6 +11,17 @@
     <a href="./">Home</a>
     <a href="admin/">Admin</a>
 
+    <form action="/login" method="POST">
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required>
+        
+        <label for="password">Passord:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">Logg inn</button>
+    </form>
+      
+
     <h2>Legg til en aktivitet</h2>
     <div class="container"></div>
         <form id="regForm">

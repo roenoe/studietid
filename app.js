@@ -3,7 +3,14 @@ const path = require('path')
 const db = sqlite3('./sql/studietid.db', {verbose: console.log})
 const express = require('express')
 const app = express()
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 const staticPath = path.join(__dirname, 'public')
+
+// Middleware for å parse innkommende forespørsler
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -74,7 +81,16 @@ function checkEmail(email) {
 function getIdByEmail(email) { 
     let sql = db.prepare('SELECT id FROM user WHERE email = ?')
     let rows = sql.all(email)
+    if (rows.length == 0) {
+        return false
+    }
     return rows[0].id
+}
+
+function getUser(id) {
+    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
+    let rows = sql.all(id)
+    return rows[0]
 }
 
 function delUser(id) {
@@ -196,17 +212,58 @@ app.post('/registeractivity/', (req, res) => {
     return res.json({ message: 'Activity registered', activity: activity })
 }*/
 
+// Rute for innlogging
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    
+    // Finn brukeren basert på brukernavn
+    const userid = getIdByEmail(email)//hent bruker fra databasen basert på email
+    if (!userid) {
+        return res.status(401).send('Ugyldig email!! eller passord');
+    }
+    
+    const user = getUser(userid)
+    console.log(user)
 
-/*app.post('/deleteuser/', (req, res) => {
-    console.log('/deleteuser/')
-    const { userid } = req.body
+    if (!user) {
+        return res.status(401).send('Ugyldig email!! eller passord');
+    }
 
-    console.log(req.body)
+    // Sjekk om passordet samsvarer med hash'en i databasen
 
-    console.log("userid", userid)
-    delUser(userid)
-    res.send('User deleted')
-})*/
+    const saltRounds = 10
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    //const isMatch = await bcrypt.compare(user.password, hashedPassword);
+    const isMatch = hashedPassword == user.password
+
+    if (isMatch) {
+        // Lagre innloggingsstatus i session
+        req.session.loggedIn = true;
+        req.session.email = user.email;
+        return res.send('Innlogging vellykket!');
+    } else {
+        return res.status(401).send('Ugyldig email eller passord');
+    }
+});
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+    secret: 'hemmelig_nøkkel',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
+}));
+
+// Beskyttet rute som krever at brukeren er innlogget
+app.get('/dashboard', (req, res) => {
+    if (req.session.loggedIn) {
+        res.send(`Velkommen, ${req.session.username}!`);
+    } else {
+        res.status(403).send('Du må være logget inn for å se denne siden.');
+    }
+});
 
 app.use(express.static(staticPath)) // Serve static files
 app.listen(21570, () => console.log('Server running on http://localhost:21570/')) 

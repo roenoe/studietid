@@ -1,7 +1,7 @@
 # Her er loggen min og todelidolisten min
 
 ## Todelido
-* Fikse tidformatet mitt
+* Sjekke om du er logget inn over alt.
 * Lage en side for å legge til aktiviteter for brukere
 * Omstrukturere for å lage en egen adminmappe
 
@@ -25,5 +25,8 @@ Jeg flyttet adminsidene til en egen mappe, og jeg begynte på en funksjon for å
 ## 04/10/24
 Nå er det mulig for brukere å opprette aktiviteter. Jeg har også passet på at datoen er formatert rett og satt til Oslo sin tidssone.
 Ryddet i funksjoner for å oppdatere aktiviteter
+
+## 14/10/24
+Nå er begynnelsen på et login system på plass. Sjekker fortsatt ikke om du er admin, men det kan jeg gjøre senere.
 
 
