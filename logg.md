@@ -29,4 +29,6 @@ Ryddet i funksjoner for å oppdatere aktiviteter
 ## 14/10/24
 Nå er begynnelsen på et login system på plass. Sjekker fortsatt ikke om du er admin, men det kan jeg gjøre senere.
 
+## 16/10/24
+Nå redirecter index.html deg for å få deg til å logge inn. /admin/[index.html] sjekker om du er admin. Ingen andre admin sider gjør det.
 

@@ -15,6 +15,13 @@ app.use(express.json());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use(session({
+    secret: 'hemmelig_nøkkel',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
+}));
+
 app.get('/'), (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'))
 }
@@ -118,6 +125,26 @@ function checkActivity(idUser, startTime) {
     return false
 }
 
+function checkLoggedIn(req, res, next) {
+    if (req.session.loggedIn) {
+        console.log('Logged in')
+        return next();
+    } else {
+        console.log('Not logged in')
+        return res.redirect('/login.html');
+    }
+}
+
+function checkIfAdmin(req, res, next) {
+    if (req.session.isAdmin) {
+        console.log('Admin')
+        return next();
+    } else {
+        console.log('Not admin')
+        return res.status(403).send('Du må være admin for å se denne siden.');
+    }
+}
+
 app.get('/getusers/', (req, res) => { 
     console.log('/getUsers/')
 
@@ -142,18 +169,18 @@ app.get('/getactivities/', (req, res) => {
 })
 
 app.get('/getsubjects/', (req, res) => {
-    console.log('/getsubjects/')
+//    console.log('/getsubjects/')
     const sql = db.prepare('SELECT * FROM subject')
     let subjects = sql.all()
-    console.log("subjects.length", subjects.length)
+//    console.log("subjects.length", subjects.length)
     res.send(subjects)
 })
 
 app.get('/getrooms/', (req, res) => {
-    console.log('/getrooms/')
+//    console.log('/getrooms/')
     const sql = db.prepare('SELECT * FROM room')
     let rooms = sql.all()
-    console.log("rooms.length", rooms.length)
+//    console.log("rooms.length", rooms.length)
     res.send(rooms)
 })
 
@@ -219,29 +246,29 @@ app.post('/login', async (req, res) => {
     // Finn brukeren basert på brukernavn
     const userid = getIdByEmail(email)//hent bruker fra databasen basert på email
     if (!userid) {
-        return res.status(401).send('Ugyldig email!! eller passord');
+        return res.status(401).send('Ugyldig email eller passord');
     }
     
     const user = getUser(userid)
     console.log(user)
 
     if (!user) {
-        return res.status(401).send('Ugyldig email!! eller passord');
+        return res.status(401).send('Ugyldig email eller passord');
     }
 
     // Sjekk om passordet samsvarer med hash'en i databasen
-
-    const saltRounds = 10
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    //const isMatch = await bcrypt.compare(user.password, hashedPassword);
-    const isMatch = hashedPassword == user.password
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
         // Lagre innloggingsstatus i session
         req.session.loggedIn = true;
         req.session.email = user.email;
-        return res.send('Innlogging vellykket!');
+        req.session.username = user.firstName + ' ' + user.lastName;
+        if (user.role == 'Administrator') {
+            req.session.isAdmin = true;
+        }
+        return res.redirect('/');
+        //res.send('Innlogging vellykket!');
     } else {
         return res.status(401).send('Ugyldig email eller passord');
     }
@@ -249,21 +276,25 @@ app.post('/login', async (req, res) => {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(session({
-    secret: 'hemmelig_nøkkel',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
-}));
 
 // Beskyttet rute som krever at brukeren er innlogget
-app.get('/dashboard', (req, res) => {
+/*app.get('/admin', (req, res) => {
     if (req.session.loggedIn) {
-        res.send(`Velkommen, ${req.session.username}!`);
+        //res.send(`Velkommen, ${req.session.username}!`)
+        res.redirect('/admin/index.html') // Redirect til admin.html;
     } else {
         res.status(403).send('Du må være logget inn for å se denne siden.');
     }
-});
+});*/
+
+// Beskyttet rute som krever at brukeren er admin
+app.get('/admin', checkIfAdmin, (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'))
+})
+
+app.get('/', checkLoggedIn, (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'))
+})
 
 app.use(express.static(staticPath)) // Serve static files
 app.listen(21570, () => console.log('Server running on http://localhost:21570/')) 
