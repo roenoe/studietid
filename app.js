@@ -5,6 +5,7 @@ const express = require('express')
 const app = express()
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const { stat } = require('fs')
 const staticPath = path.join(__dirname, 'public')
 
 // Middleware for å parse innkommende forespørsler
@@ -146,12 +147,10 @@ function checkIfAdmin(req, res, next) {
 }
 
 app.get('/getusers/', (req, res) => { 
-    console.log('/getUsers/')
 
     const sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, role.name  as role ' + 
         'FROM user inner join role on user.idrole = role.id ');
     let users = sql.all()   
-    console.log("users.length", users.length)
     
     res.send(users)
 })
@@ -267,8 +266,12 @@ app.post('/login', async (req, res) => {
         if (user.role == 'Administrator') {
             req.session.isAdmin = true;
         }
-        return res.redirect('/');
-        //res.send('Innlogging vellykket!');
+
+        if (req.session.isAdmin) {
+            return res.redirect('/admin');
+        } else {
+            return res.redirect('/');
+        }
     } else {
         return res.status(401).send('Ugyldig email eller passord');
     }
@@ -277,24 +280,22 @@ app.post('/login', async (req, res) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Beskyttet rute som krever at brukeren er innlogget
-/*app.get('/admin', (req, res) => {
-    if (req.session.loggedIn) {
-        //res.send(`Velkommen, ${req.session.username}!`)
-        res.redirect('/admin/index.html') // Redirect til admin.html;
-    } else {
-        res.status(403).send('Du må være logget inn for å se denne siden.');
-    }
-});*/
+
 
 // Beskyttet rute som krever at brukeren er admin
-app.get('/admin', checkIfAdmin, (req, res) => {
-    res.sendFile(path.join(staticPath, 'index.html'))
+app.get('/admin' && '/admin/*', checkLoggedIn, checkIfAdmin, (req, res) => {
+    return res.sendFile(path.join(staticPath)); // Ensure the correct path to the admin HTML file
 })
 
 app.get('/', checkLoggedIn, (req, res) => {
-    res.sendFile(path.join(staticPath, 'index.html'))
+    return res.sendFile(path.join(staticPath));
 })
+
+// Rute for utlogging
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
 
 app.use(express.static(staticPath)) // Serve static files
 app.listen(21570, () => console.log('Server running on http://localhost:21570/')) 

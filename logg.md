@@ -32,3 +32,6 @@ Nå er begynnelsen på et login system på plass. Sjekker fortsatt ikke om du er
 ## 16/10/24
 Nå redirecter index.html deg for å få deg til å logge inn. /admin/[index.html] sjekker om du er admin. Ingen andre admin sider gjør det.
 
+## 17/10/24
+Nå sjekker alle sider om du har logget inn. Alle adminsider sjekker om du er admin.
+
