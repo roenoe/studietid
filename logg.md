@@ -35,3 +35,7 @@ Nå redirecter index.html deg for å få deg til å logge inn. /admin/[index.htm
 ## 17/10/24
 Nå sjekker alle sider om du har logget inn. Alle adminsider sjekker om du er admin.
 
+## 22/10/24
+Jeg har gjort at hver bruker nå kan se sin individuelle aktivitetsliste. Jeg har også prøvd å gjøre registreringen av aktiviteter mer sikker ved å ikke la brukere selv bestemme status på aktiviteter.
+Dette trenger fortsatt arbeid.
+

@@ -1,10 +1,28 @@
 const regForm = document.getElementById('regForm')
 regForm.addEventListener('submit', registerActivity)
+const activityList = document.getElementById('activityList')
+const headerBar = document.getElementById('headerBar');
+
+async function fetchUsername() {
+    try {
+        let response = await fetch('/getusername/')
+        let data = await response.json();
+        console.log(response)
+
+        const username = data.username
+        headerBar.innerHTML = `Studietid, ${username}`
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
 fetchOptions()
 function fetchOptions() {
     fetchSubjects()
     fetchRooms()
+    fetchActivities()
+    fetchUsername()
 }
 
 async function fetchSubjects() {
@@ -72,4 +90,41 @@ async function registerActivity(event) {
     } catch (error) {
         console.error('Error:', error);
     }
+    fetchActivities()
+}
+
+async function fetchActivities() {
+    try {
+        let response = await fetch('/getactivities/')
+        let data = await response.json();
+        displayActivities(data);
+        
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function displayActivities(data) {
+    if (data.length === 0) {
+        activityList.innerHTML = `<tr><td>No activities found</td></tr>`;
+        return;
+    }
+    activityList.innerHTML = `
+        <tr>
+            <th>Subject</th>
+            <th>Room</th>
+            <th>Duration</th>
+            <th>Status</th>
+        </tr>`; // Tøm listen først
+
+        data.forEach(activity => {
+            let listItem = document.createElement('tr');
+            listItem.innerHTML = `
+            <td>${activity.subjectname}</td> 
+            <td>${activity.roomname}</td>
+            <td>${activity.duration}</td>
+            <td>${activity.status}</td>
+            `
+            activityList.appendChild(listItem);
+        });
 }

@@ -106,10 +106,12 @@ function delUser(id) {
     sql.run(id)
 }
 
-function registerActivity(idUser, idSubject, idRoom, idStatus, duration) {
+function registerActivity(idSubject, idRoom, duration) {
     let date = new Date().toLocaleString('sv-SE', {timeZone: 'Europe/Oslo'})
     let sqlDate = date.toString().slice(0, 19).replace('T', ' ')
     let startTime = sqlDate
+    let idUser = 1 // Hardcoded for now
+    let idStatus = 2
 
     let check = checkActivity(idUser, startTime)
     let sql = db.prepare("INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus, duration) " + 
@@ -146,6 +148,15 @@ function checkIfAdmin(req, res, next) {
     }
 }
 
+app.get('/getusername/', (req, res) => {
+    if (req.session.loggedIn) {
+        data = {username: req.session.username}
+        res.send(data)
+    } else {
+        res.send('Not logged in')
+    }
+})
+
 app.get('/getusers/', (req, res) => { 
 
     const sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, role.name  as role ' + 
@@ -156,15 +167,22 @@ app.get('/getusers/', (req, res) => {
 })
 
 app.get('/getactivities/', (req, res) => { 
-//    console.log('/getactivities/')
-    const sqltext = 'select activity.id as activityid, firstname as firstname, lastname as lastname, email, subject.name as subjectname, startTime as starttime, duration, room.name as roomname, status.name as status ' + 
-        'FROM activity inner join user on activity.idUser = user.id ' + ' inner join room on activity.idRoom = room.id ' + ' inner join subject on activity.idSubject = subject.id ' + ' inner join status on activity.idStatus = status.id '
-//        console.log(sqltext)
-    const sql = db.prepare(sqltext);
-
+    let sqltext = ''
+    if (req.session.isAdmin) {
+        sqltext = 'select activity.id as activityid, firstname as firstname, lastname as lastname, email, subject.name as subjectname, startTime as starttime, duration, room.name as roomname, status.name as status ' + 
+            'FROM activity inner join user on activity.idUser = user.id ' + ' inner join room on activity.idRoom = room.id ' + ' inner join subject on activity.idSubject = subject.id ' + ' inner join status on activity.idStatus = status.id ' 
+    } else {
+        sqltext = 'select subject.name as subjectname, startTime as starttime, duration, room.name as roomname, status.name as status ' + 
+            'FROM activity inner join room on activity.idRoom = room.id ' + ' inner join subject on activity.idSubject = subject.id ' + ' inner join status on activity.idStatus = status.id ' + ' WHERE idUser = ?'
+    }
+    let sql = db.prepare(sqltext); 
+if (req.session.isAdmin) {
         let activities = sql.all()   
-//    console.log("activities.length", activities.length)
-    res.send(activities)
+        res.send(activities)
+    } else {
+        let activities = sql.all(req.session.userid)   
+        res.send(activities)
+    }
 })
 
 app.get('/getsubjects/', (req, res) => {
@@ -176,10 +194,8 @@ app.get('/getsubjects/', (req, res) => {
 })
 
 app.get('/getrooms/', (req, res) => {
-//    console.log('/getrooms/')
     const sql = db.prepare('SELECT * FROM room')
     let rooms = sql.all()
-//    console.log("rooms.length", rooms.length)
     res.send(rooms)
 })
 
@@ -263,6 +279,7 @@ app.post('/login', async (req, res) => {
         req.session.loggedIn = true;
         req.session.email = user.email;
         req.session.username = user.firstName + ' ' + user.lastName;
+        req.session.userid = user.userid;
         if (user.role == 'Administrator') {
             req.session.isAdmin = true;
         }
