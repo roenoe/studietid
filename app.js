@@ -28,13 +28,20 @@ app.get('/'), (req, res) => {
 }
 
 app.post('/adduser/', (req, res) => {
-    const { firstName, lastName, idRole, isAdmin, email } = req.body
+    const { firstName, lastName, email, password } = req.body
 
     req = req.body
     console.log(req)
 
-    console.log(firstName, lastName, idRole, isAdmin, email)
-    let user = addUser(req.firstName, req.lastName, req.idRole, req.isAdmin, req.email)
+    console.log(firstName, lastName, email)
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(password, salt);
+
+    const idRole = 3
+    const isAdmin = 0
+
+    let user = addUser(firstName, lastName, idRole, isAdmin, email, hash)
 
     if (!user) {
         return res.json({error: 'Failed to register user'})
@@ -43,16 +50,16 @@ app.post('/adduser/', (req, res) => {
     return res.json({ message: 'User registered', user: user })
 })
 
-function addUser(firstName, lastName, idRole, isAdmin, email)
+function addUser(firstName, lastName, idRole, isAdmin, email, hash)
  {
     let check = checkEmail(email)
     if (check) {
         return check
     }
 
-    let sql = db.prepare("INSERT INTO user (firstName, lastName, idRole, isAdmin, email) " + 
-                         " values (?, ?, ?, ?, ?)")
-    const info = sql.run(firstName, lastName, idRole, isAdmin, email)
+    let sql = db.prepare("INSERT INTO user (firstName, lastName, idRole, isAdmin, email, password) " + 
+                         " values (?, ?, ?, ?, ?, ?)")
+    const info = sql.run(firstName, lastName, idRole, isAdmin, email, hash)
     
     sql = db.prepare('SELECT user.id as userid, firstname, lastname, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
     let rows = sql.all(info.lastInsertRowid)
@@ -60,6 +67,19 @@ function addUser(firstName, lastName, idRole, isAdmin, email)
 
     return rows[0]
 }
+
+/*app.get('/promoteuser/', (req, res) => {
+    const { userid } = req.body
+
+
+    let sqltext = 'UPDATE user SET idRole = ? WHERE id = ?'
+
+    if (!user) {
+        return res.json({error: 'Failed to promote user'})
+    }
+
+    return res.json({ message: 'User promoted', user: user })
+})*/
 
 function checkEmail(email) {
     var at = 0
@@ -106,11 +126,10 @@ function delUser(id) {
     sql.run(id)
 }
 
-function registerActivity(idSubject, idRoom, duration) {
+function registerActivity(idUser, idSubject, idRoom, duration) {
     let date = new Date().toLocaleString('sv-SE', {timeZone: 'Europe/Oslo'})
     let sqlDate = date.toString().slice(0, 19).replace('T', ' ')
     let startTime = sqlDate
-    let idUser = 1 // Hardcoded for now
     let idStatus = 2
 
     let check = checkActivity(idUser, startTime)
@@ -144,7 +163,7 @@ function checkIfAdmin(req, res, next) {
         return next();
     } else {
         console.log('Not admin')
-        return res.status(403).send('Du må være admin for å se denne siden.');
+        return res.stareq.session.useridtus(403).send('Du må være admin for å se denne siden.');
     }
 }
 
@@ -226,16 +245,10 @@ app.post('/deleteactivity/', (req, res) => {
 
 app.post('/registeractivity/', (req, res) => {
     console.log('/registeractivity/')
-    const { idUser, idSubject, idRoom, idStatus, duration } = req.body
+    const { idSubject, idRoom, duration } = req.body
+    const idUser = req.session.userid
 
-    console.log(req.body)
-
-    console.log("idUser", idUser)
-    console.log("idSubject", idSubject)
-    console.log("idRoom", idRoom)
-    console.log("idStatus", idStatus)
-    console.log("duration", duration)
-    registerActivity(idUser, idSubject, idRoom, idStatus, duration)
+    registerActivity(idUser, idSubject, idRoom, duration)
     res.send('Activity registered')
 })
 

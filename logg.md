@@ -1,10 +1,5 @@
 # Her er loggen min og todelidolisten min
 
-## Todelido
-* Sjekke om du er logget inn over alt.
-* Lage en side for å legge til aktiviteter for brukere
-* Omstrukturere for å lage en egen adminmappe
-
 ## 17/09/24
 Jeg lagde logg. Så også på den offisielle studietidnettsiden og prøvde å få en oversikt over hva jeg må lage.
 Lagde en .gitignore og oppdaterte README.md
@@ -38,4 +33,8 @@ Nå sjekker alle sider om du har logget inn. Alle adminsider sjekker om du er ad
 ## 22/10/24
 Jeg har gjort at hver bruker nå kan se sin individuelle aktivitetsliste. Jeg har også prøvd å gjøre registreringen av aktiviteter mer sikker ved å ikke la brukere selv bestemme status på aktiviteter.
 Dette trenger fortsatt arbeid.
+
+## 25/10/24
+Brukere kan nå ikke lenger bestemme status på nye aktiviteter selv. 
+Nå kan admins legge til nye brukere *med passord*. Funksjonene /promoteuser/ og /demoteuser/ trenger mer arbeid.
 

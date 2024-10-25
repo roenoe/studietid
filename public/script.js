@@ -60,10 +60,10 @@ async function fetchRooms() {
 async function registerActivity(event) {
     event.preventDefault()
         let newActivity = {
-        idUser: 1,
+        //idUser: 1,
         idSubject: regForm.elements['idSubject'].value,
         idRoom: regForm.elements['idRoom'].value,
-        idStatus: 2,
+        //idStatus: 2,
         duration: regForm.elements['duration'].value
     }
 

@@ -15,7 +15,7 @@ async function fetchUsers() {
 
 function displayPersons() {
     const personList = document.getElementById('personList');
-    personList.innerHTML = `<tr><th>ID</th><th>Name</th><th>email</th><th>Role</th></tr>`; // Tøm listen først
+    personList.innerHTML = `<tr><th>ID</th><th>Name</th><th>email</th><th>Role</th><th>Button</th></tr>`; // Tøm listen først
     
     persons.forEach(person => {
         const listItem = document.createElement('tr');
@@ -24,9 +24,60 @@ function displayPersons() {
         <td>${person.firstName + " " + person.lastName}</td> 
         <td>${person.email}</td>
         <td>${person.role}</td>
+        <td>
+            <button onclick="promoteUser(${person.userid})" class="green">Promote</button>
+            <button onclick="demoteUser(${person.userid})" class="orange">Demote</button>
+        </td>
+
         `
         personList.appendChild(listItem);
     });
+}
+
+async function promoteUser(userid) {
+    console.log(userid)
+    try {
+        let response = await fetch('/promoteuser/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userid: userid})
+        })
+
+        let data = await response.json();
+
+        if (data.error) {
+            alert(data.error)
+        } else { 
+            fetchUsers()
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function demoteUser(userid) {
+    console.log(userid)
+    try {
+        let response = await fetch('/demoteuser/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userid: userid})
+        })
+
+        let data = await response.json();
+
+        if (data.error) {
+            alert(data.error)
+        } else { 
+            fetchUsers()
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 const regForm = document.getElementById('regForm')
@@ -34,17 +85,18 @@ regForm.addEventListener('submit', adduser)
 const firstNameField = document.getElementById('firstName')
 const lastNameField = document.getElementById('lastName')
 const emailField = document.getElementById('email')
+const passwordField1 = document.getElementById('password1')
+const passwordField2 = document.getElementById('password2')
 
 async function adduser(event) {
     event.preventDefault()
+    if (passwordField1.value !== passwordField2.value) {return alert('Passwords do not match. Please try again.')}
     let newUser = {
         firstName: firstNameField.value,
         lastName: lastNameField.value,
-        idRole: 3,
-        isAdmin: 0,
-        email: emailField.value
+        email: emailField.value,
+        password: passwordField1.value
     }
-//    const formData = new FormData(regForm)
     
     console.log(newUser)
 
