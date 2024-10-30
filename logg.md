@@ -38,3 +38,11 @@ Dette trenger fortsatt arbeid.
 Brukere kan nå ikke lenger bestemme status på nye aktiviteter selv. 
 Nå kan admins legge til nye brukere *med passord*. Funksjonene /promoteuser/ og /demoteuser/ trenger mer arbeid.
 
+## 30/10/24
+Nå har jeg fikset /promoteuser.
+Neste gang burde jeg gjøre at admins kan legge til aktiviteter på vegne av elever.
+
+## 30/10/24
+Nå har jeg fikset /promoteuser.
+Neste gang burde jeg gjøre at admins kan legge til aktiviteter på vegne av elever.
+

@@ -68,18 +68,27 @@ function addUser(firstName, lastName, idRole, isAdmin, email, hash)
     return rows[0]
 }
 
-/*app.get('/promoteuser/', (req, res) => {
+app.post('/promoteuser/', (req, res) => {
     const { userid } = req.body
 
-
+    const user = getUser(userid)
     let sqltext = 'UPDATE user SET idRole = ? WHERE id = ?'
+    let sql = db.prepare(sqltext)
+
+    if (user.role == 'Administrator') {
+        sql.run(3, userid)
+    } else if (user.role == 'Elev') {
+        sql.run(2, userid)
+    } else {
+        sql.run(1, userid)
+    }
 
     if (!user) {
         return res.json({error: 'Failed to promote user'})
     }
 
     return res.json({ message: 'User promoted', user: user })
-})*/
+})
 
 function checkEmail(email) {
     var at = 0

@@ -24,10 +24,7 @@ function displayPersons() {
         <td>${person.firstName + " " + person.lastName}</td> 
         <td>${person.email}</td>
         <td>${person.role}</td>
-        <td>
-            <button onclick="promoteUser(${person.userid})" class="green">Promote</button>
-            <button onclick="demoteUser(${person.userid})" class="orange">Demote</button>
-        </td>
+        <td><button onclick="promoteUser(${person.userid})" class="green">Promote</button></td>
 
         `
         personList.appendChild(listItem);
@@ -55,29 +52,7 @@ async function promoteUser(userid) {
     } catch (error) {
         console.error('Error:', error);
     }
-}
-
-async function demoteUser(userid) {
-    console.log(userid)
-    try {
-        let response = await fetch('/demoteuser/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({userid: userid})
-        })
-
-        let data = await response.json();
-
-        if (data.error) {
-            alert(data.error)
-        } else { 
-            fetchUsers()
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
+    fetchUsers()
 }
 
 const regForm = document.getElementById('regForm')
