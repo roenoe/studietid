@@ -39,9 +39,8 @@ app.post('/adduser/', (req, res) => {
     const hash = bcrypt.hashSync(password, salt);
 
     const idRole = 3
-    const isAdmin = 0
 
-    let user = addUser(firstName, lastName, idRole, isAdmin, email, hash)
+    let user = addUser(firstName, lastName, idRole, email, hash)
 
     if (!user) {
         return res.json({error: 'Failed to register user'})
@@ -50,16 +49,16 @@ app.post('/adduser/', (req, res) => {
     return res.json({ message: 'User registered', user: user })
 })
 
-function addUser(firstName, lastName, idRole, isAdmin, email, hash)
+function addUser(firstName, lastName, idRole, email, hash)
  {
     let check = checkEmail(email)
     if (check) {
         return check
     }
 
-    let sql = db.prepare("INSERT INTO user (firstName, lastName, idRole, isAdmin, email, password) " + 
-                         " values (?, ?, ?, ?, ?, ?)")
-    const info = sql.run(firstName, lastName, idRole, isAdmin, email, hash)
+    let sql = db.prepare("INSERT INTO user (firstName, lastName, idRole, email, password) " + 
+                         " values (?, ?, ?, ?, ?)")
+    const info = sql.run(firstName, lastName, idRole, email, hash)
     
     sql = db.prepare('SELECT user.id as userid, firstname, lastname, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
     let rows = sql.all(info.lastInsertRowid)
@@ -172,7 +171,7 @@ function checkIfAdmin(req, res, next) {
         return next();
     } else {
         console.log('Not admin')
-        return res.stareq.session.useridtus(403).send('Du må være admin for å se denne siden.');
+        return res.status(403).send('Du må være admin for å se denne siden.');
     }
 }
 

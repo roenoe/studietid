@@ -46,3 +46,5 @@ Neste gang burde jeg gjøre at admins kan legge til aktiviteter på vegne av ele
 Nå har jeg fikset /promoteuser.
 Neste gang burde jeg gjøre at admins kan legge til aktiviteter på vegne av elever.
 
+## 11/11/24
+Bugfix
