@@ -97,4 +97,5 @@ async function adduser(event) {
         console.error('Error:', error);
     }
     fetchUsers()
+    regForm.reset()
 }

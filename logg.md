@@ -48,3 +48,7 @@ Neste gang burde jeg gjøre at admins kan legge til aktiviteter på vegne av ele
 
 ## 11/11/24
 Bugfix
+
+## 13/11/24
+Jeg har sørget for at man må være logget inn og admin dersom man skal få gjennomføre enhver get og post request med mulig sensitiv informasjon.
+

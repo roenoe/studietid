@@ -27,7 +27,7 @@ app.get('/'), (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'))
 }
 
-app.post('/adduser/', (req, res) => {
+app.post('/adduser/', checkIfAdmin, (req, res) => {
     const { firstName, lastName, email, password } = req.body
 
     req = req.body
@@ -67,7 +67,7 @@ function addUser(firstName, lastName, idRole, email, hash)
     return rows[0]
 }
 
-app.post('/promoteuser/', (req, res) => {
+app.post('/promoteuser/', checkIfAdmin, (req, res) => {
     const { userid } = req.body
 
     const user = getUser(userid)
@@ -175,16 +175,12 @@ function checkIfAdmin(req, res, next) {
     }
 }
 
-app.get('/getusername/', (req, res) => {
-    if (req.session.loggedIn) {
-        data = {username: req.session.username}
-        res.send(data)
-    } else {
-        res.send('Not logged in')
-    }
+app.get('/getusername/', checkLoggedIn, (req, res) => {
+    let data = {username: req.session.username}
+    res.send(data)
 })
 
-app.get('/getusers/', (req, res) => { 
+app.get('/getusers/', checkIfAdmin, (req, res) => { 
 
     const sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, role.name  as role ' + 
         'FROM user inner join role on user.idrole = role.id ');
@@ -193,7 +189,7 @@ app.get('/getusers/', (req, res) => {
     res.send(users)
 })
 
-app.get('/getactivities/', (req, res) => { 
+app.get('/getactivities/', checkLoggedIn, (req, res) => { 
     let sqltext = ''
     if (req.session.isAdmin) {
         sqltext = 'select activity.id as activityid, firstname as firstname, lastname as lastname, email, subject.name as subjectname, startTime as starttime, duration, room.name as roomname, status.name as status ' + 
@@ -212,7 +208,7 @@ if (req.session.isAdmin) {
     }
 })
 
-app.get('/getsubjects/', (req, res) => {
+app.get('/getsubjects/', checkLoggedIn, (req, res) => {
 //    console.log('/getsubjects/')
     const sql = db.prepare('SELECT * FROM subject')
     let subjects = sql.all()
@@ -220,13 +216,13 @@ app.get('/getsubjects/', (req, res) => {
     res.send(subjects)
 })
 
-app.get('/getrooms/', (req, res) => {
+app.get('/getrooms/', checkLoggedIn, (req, res) => {
     const sql = db.prepare('SELECT * FROM room')
     let rooms = sql.all()
     res.send(rooms)
 })
 
-app.post('/updateactivity/', (req, res) => {
+app.post('/updateactivity/', checkIfAdmin, (req, res) => {
     console.log('/updateactivity/')
     const { activityid, idStatus } = req.body
 
@@ -239,7 +235,7 @@ app.post('/updateactivity/', (req, res) => {
     res.send('Activity updated')
 })
 
-app.post('/deleteactivity/', (req, res) => {
+app.post('/deleteactivity/', checkIfAdmin, (req, res) => {
     console.log('/deleteactivity/')
     const { activityid } = req.body
 
@@ -251,7 +247,7 @@ app.post('/deleteactivity/', (req, res) => {
     res.send('Activity deleted')
 })
 
-app.post('/registeractivity/', (req, res) => {
+app.post('/registeractivity/', checkLoggedIn, (req, res) => {
     console.log('/registeractivity/')
     const { idSubject, idRoom, duration } = req.body
     const idUser = req.session.userid
@@ -259,21 +255,6 @@ app.post('/registeractivity/', (req, res) => {
     registerActivity(idUser, idSubject, idRoom, duration)
     res.send('Activity registered')
 })
-
-/*app.post('/addactivity/'), (req, res) => {        
-    const { idUser, idSubject, idRoom, idStatus, duration } = req.body
-
-    console.log(req.body)
-
-    console.log(idUser, idSubject, idRoom, idStatus, duration)
-    let activity = registerActivity(idUser, idSubject, idRoom, idStatus, duration)
-
-    if (!activity) {
-        return res.json({error: 'Failed to register activity'})
-    }
-
-    return res.json({ message: 'Activity registered', activity: activity })
-}*/
 
 // Rute for innlogging
 app.post('/login', async (req, res) => {
@@ -330,7 +311,7 @@ app.get('/', checkLoggedIn, (req, res) => {
 })
 
 // Rute for utlogging
-app.get('/logout', (req, res) => {
+app.get('/logout', checkLoggedIn, (req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
